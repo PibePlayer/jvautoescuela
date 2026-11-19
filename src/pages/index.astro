@@ -1,16 +1,849 @@
 ---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PromoCarousel from '../components/PromoCarousel.astro';
+import Faq from '../components/Faq.astro';
+import { site, waLink, ars } from '../data/site';
+import { categories, fromPrice } from '../data/cursos';
+import { faqs } from '../data/faq';
+
+export const prerender = true;
+
+const pillars = [
+  {
+    icon: 'user',
+    title: 'Un instructor sólo para vos',
+    text: 'Clases individuales: nada de turnos compartidos ni esperar en un auto lleno. Tu ritmo, tus dudas.',
+  },
+  {
+    icon: 'pedals',
+    title: 'Autos doble comando en regla',
+    text: 'Vehículos con doble pedal, mantenimiento al día y seguro para el alumno en cada clase.',
+  },
+  {
+    icon: 'route',
+    title: 'Tránsito real de Hurlingham',
+    text: 'Practicás en las calles donde vas a manejar: avenidas, rotondas, pasos a nivel y el recorrido del examen.',
+  },
+  {
+    icon: 'calendar',
+    title: 'Horarios a tu medida',
+    text: 'Lunes a sábado. Elegís día y hora, y te pasamos a buscar por tu casa o trabajo.',
+  },
+  {
+    icon: 'shield',
+    title: 'Te acompañamos al examen',
+    text: 'Rendís con el mismo auto con el que practicaste. Simulacro previo incluido en los packs completos.',
+  },
+  {
+    icon: 'card',
+    title: 'Cuotas y facilidades',
+    text: 'Efectivo, transferencia, Mercado Pago o hasta 6 cuotas sin interés con tarjeta.',
+  },
+] as const;
+
+const compare = [
+  ['Instructor dedicado exclusivamente a vos', true, false],
+  ['Elegís día y horario de cada clase', true, false],
+  ['Te buscamos por tu casa', true, false],
+  ['Plan según tu nivel (inicial, intermedio, avanzado)', true, false],
+  ['Auto, moto, camión y colectivo', true, false],
+  ['Acompañamiento al examen con el mismo vehículo', true, false],
+] as const;
+
+const steps = [
+  { n: '01', title: 'Escribinos', text: 'Contanos qué querés manejar y tu experiencia. Te recomendamos el pack justo, sin vueltas.' },
+  { n: '02', title: 'Agendá tu primera clase', text: 'Elegís día, horario y punto de encuentro. Arrancás esa misma semana.' },
+  { n: '03', title: 'Practicá con confianza', text: 'Instructor dedicado, auto doble comando y tránsito real desde el primer día.' },
+  { n: '04', title: 'Rendí y aprobá', text: 'Simulacro del examen y acompañamiento con el auto que ya conocés.' },
+];
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Base>
+  <!-- HERO -->
+  <section class="hero" aria-labelledby="hero-title">
+    <img
+      src="/img/hero-auto.webp"
+      alt="Gol rojo ploteado de JV Autoescuela circulando por una avenida de Hurlingham con alumno e instructor"
+      class="hero__bg"
+      width="1376"
+      height="768"
+      fetchpriority="high"
+    />
+    <div class="hero__shade" aria-hidden="true"></div>
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <p class="hero__badge">
+          <span class="hero__badge-num">N°1</span>
+          La autoescuela mejor valorada de Hurlingham
+        </p>
+        <h1 id="hero-title">Aprendé a manejar <span>de verdad.</span></h1>
+        <p class="hero__lead">
+          Clases particulares en auto manual y automático, motos de todas las cilindradas, camiones y colectivos.
+          Un instructor dedicado sólo a vos, en el tránsito real de Hurlingham.
+        </p>
+        <div class="hero__actions">
+          <a href={waLink()} target="_blank" rel="noopener" class="btn btn--gold" id="hero-cta-wa">
+            <Icon name="whatsapp" /> Quiero empezar
+          </a>
+          <a href="/cursos" class="btn btn--ghost" id="hero-cta-cursos">Ver cursos y precios</a>
+        </div>
+        <ul class="hero__proof">
+          <li>
+            <strong><span class="stars">★</span> {site.google.rating.toString().replace('.', ',')}</strong>
+            <span>{site.google.reviews} reseñas en Google</span>
+          </li>
+          <li>
+            <strong>5</strong>
+            <span>tipos de vehículo</span>
+          </li>
+          <li>
+            <strong>1 a 1</strong>
+            <span>instructor por alumno</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMOS -->
+  <div class="container promos-wrap">
+    <PromoCarousel />
+  </div>
+
+  <!-- CURSOS -->
+  <section class="section" id="cursos" aria-labelledby="cursos-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Nuestros cursos</p>
+        <h2 id="cursos-title">¿Qué querés aprender a manejar?</h2>
+        <p>Del primer auto a la licencia profesional. Elegí tu vehículo y encontrá el pack ideal para tu nivel.</p>
+      </div>
+
+      <div class="cat-grid">
+        {
+          categories.map((c, i) => {
+            const from = fromPrice(c);
+            return (
+              <a href={`/cursos/${c.slug}`} class:list={['cat reveal', { 'cat--wide': i < 2 }]} id={`cat-${c.slug}`} style={`transition-delay:${i * 60}ms`}>
+                <img src={c.image} alt={c.imageAlt} width="1000" height="747" loading="lazy" class="cat__img" />
+                <div class="cat__body">
+                  <span class="cat__license">{c.license}</span>
+                  <h3>{c.navLabel}</h3>
+                  <p>{c.short}</p>
+                  <span class="cat__foot">
+                    <span>{from ? <>Desde <strong>{ars(from)}</strong></> : 'Consultá precios'}</span>
+                    <span class="cat__arrow"><Icon name="arrow" size={18} /></span>
+                  </span>
+                </div>
+              </a>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- POR QUÉ JV -->
+  <section class="section section--cream" id="por-que-jv" aria-labelledby="pq-title">
+    <div class="container">
+      <div class="section-head reveal">
+        <p class="eyebrow">Por qué JV</p>
+        <h2 id="pq-title">Una licencia se consigue. Manejar bien, se aprende.</h2>
+        <p>
+          Sabemos que hay opciones gratuitas. Pero sacar el registro no es lo mismo que sentirte seguro al volante. Nuestro
+          trabajo es que salgas manejando de verdad.
+        </p>
+      </div>
+
+      <div class="pillars">
+        {
+          pillars.map((p, i) => (
+            <article class="pillar reveal" style={`transition-delay:${i * 60}ms`}>
+              <span class="pillar__icon"><Icon name={p.icon} size={26} /></span>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARATIVA -->
+  <section class="section section--red textured" aria-labelledby="cmp-title">
+    <div class="container cmp">
+      <div class="cmp__copy reveal">
+        <p class="eyebrow">Lo barato sale caro</p>
+        <h2 id="cmp-title">Clases particulares vs. cursos masivos gratuitos</h2>
+        <p>
+          Tu seguridad y la de tu familia valen más que ahorrarte unas clases. Con JV tenés una formación completa,
+          personalizada y con la experiencia de quienes enseñan a manejar en Hurlingham hace años.
+        </p>
+        <a href={waLink('Hola! Quiero saber más sobre las clases particulares de JV.')} target="_blank" rel="noopener" class="btn btn--gold" id="cmp-cta">
+          <Icon name="whatsapp" /> Consultá sin compromiso
+        </a>
+      </div>
+
+      <div class="cmp__table reveal" role="table" aria-label="Comparativa">
+        <div class="cmp__row cmp__row--head" role="row">
+          <span role="columnheader"><span class="visually-hidden">Característica</span></span>
+          <span role="columnheader" class="cmp__jv"><img src="/img/logo.webp" alt="" width="34" height="34" /> JV</span>
+          <span role="columnheader">Gratuitos</span>
+        </div>
+        {
+          compare.map(([label, jv, other]) => (
+            <div class="cmp__row" role="row">
+              <span role="cell">{label}</span>
+              <span role="cell" class="cmp__yes">
+                <Icon name={jv ? 'check' : 'x'} size={18} label={jv ? 'Sí' : 'No'} />
+              </span>
+              <span role="cell" class="cmp__no">
+                <Icon name={other ? 'check' : 'x'} size={18} label={other ? 'Sí' : 'No'} />
+              </span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="section" aria-labelledby="steps-title">
+    <div class="container">
+      <div class="section-head section-head--center reveal">
+        <p class="eyebrow">Cómo funciona</p>
+        <h2 id="steps-title">De cero a tu licencia en 4 pasos</h2>
+      </div>
+      <ol class="steps">
+        {
+          steps.map((s, i) => (
+            <li class="step reveal" style={`transition-delay:${i * 80}ms`}>
+              <span class="step__n">{s.n}</span>
+              <h3>{s.title}</h3>
+              <p>{s.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- RESEÑAS -->
+  <section class="section section--dark textured reviews" aria-labelledby="reviews-title">
+    <div class="container reviews__inner">
+      <div class="reviews__score reveal">
+        <span class="reviews__num">{site.google.rating.toString().replace('.', ',')}</span>
+        <span class="reviews__stars" aria-hidden="true">★★★★★</span>
+        <span class="reviews__count">{site.google.reviews} reseñas en Google</span>
+      </div>
+      <div class="reviews__copy reveal">
+        <p class="eyebrow">Lo dicen nuestros alumnos</p>
+        <h2 id="reviews-title">La autoescuela mejor puntuada de Hurlingham</h2>
+        <p>
+          Cientos de vecinos ya aprendieron a manejar con nosotros. Leé lo que opinan y sumate a la lista de los que
+          aprobaron con JV.
+        </p>
+        <a href={site.google.reviewsUrl} target="_blank" rel="noopener" class="btn btn--light" id="reviews-cta">
+          Ver reseñas en Google <Icon name="arrow" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ + UBICACIÓN -->
+  <section class="section section--cream" id="preguntas" aria-labelledby="faq-title">
+    <div class="container faq-wrap">
+      <div>
+        <div class="section-head reveal">
+          <p class="eyebrow">Preguntas frecuentes</p>
+          <h2 id="faq-title">Todo lo que necesitás saber</h2>
+        </div>
+        <Faq items={faqs} />
+      </div>
+
+      <aside class="visit reveal" aria-labelledby="visit-title">
+        <iframe
+          src={site.address.embedUrl}
+          title="Ubicación de JV Autoescuela en Google Maps"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          class="visit__map"></iframe>
+        <div class="visit__body">
+          <h3 id="visit-title">Visitanos</h3>
+          <p class="visit__line"><Icon name="pin" size={18} /> {site.address.street}, {site.address.locality}</p>
+          {site.hours.map((h) => <p class="visit__line visit__hours"><span>{h.days}</span><strong>{h.time}</strong></p>)}
+          <div class="visit__actions">
+            <a href={waLink()} target="_blank" rel="noopener" class="btn btn--wa btn--sm" id="visit-wa"><Icon name="whatsapp" /> {site.whatsapp.display}</a>
+            <a href={site.address.mapsUrl} target="_blank" rel="noopener" class="btn btn--ghost btn--sm" id="visit-maps">Cómo llegar</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* HERO ------------------------------------------------------------------ */
+  .hero {
+    position: relative;
+    color: var(--white);
+    isolation: isolate;
+    overflow: hidden;
+    min-height: min(820px, calc(100svh - 114px));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+  }
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% 55%;
+    z-index: -2;
+    animation: heroZoom 18s var(--ease) both;
+  }
+  @keyframes heroZoom {
+    from {
+      transform: scale(1.08);
+    }
+  }
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(90deg, hsl(355 70% 9% / 0.94) 0%, hsl(355 70% 12% / 0.78) 38%, hsl(355 70% 12% / 0) 62%),
+      linear-gradient(0deg, hsl(355 70% 8% / 0.75) 0%, transparent 35%);
+  }
+  .hero__inner {
+    display: grid;
+    padding-block: clamp(3.5rem, 2rem + 5vw, 5.5rem) clamp(6rem, 4rem + 6vw, 9rem);
+  }
+  .hero__inner > * {
+    min-width: 0;
+  }
+  .hero__copy {
+    max-width: 640px;
+  }
+  .promos-wrap {
+    position: relative;
+    z-index: 2;
+    margin-top: clamp(-5.5rem, -3rem - 3vw, -3.5rem);
+  }
+  .hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.35rem 1rem 0.35rem 0.35rem;
+    border-radius: 999px;
+    background: hsl(0 0% 100% / 0.1);
+    backdrop-filter: blur(8px);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .hero__badge-num {
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    background: var(--red-600);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.04em;
+  }
+  .hero h1 {
+    font-size: var(--fs-4xl);
+    margin-top: 1.25rem;
+    letter-spacing: -0.03em;
+    max-width: 12ch;
+  }
+  .hero h1 span {
+    color: var(--gold-400);
+  }
+  .hero__lead {
+    margin-top: 1.25rem;
+    max-width: 52ch;
+    font-size: var(--fs-lg);
+    color: hsl(0 0% 100% / 0.85);
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .hero__proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.25rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid hsl(0 0% 100% / 0.18);
+  }
+  .hero__proof li {
+    display: grid;
+  }
+  .hero__proof strong {
+    font-family: var(--font-display);
+    font-stretch: 110%;
+    font-size: var(--fs-2xl);
+    line-height: 1.1;
+  }
+  .hero__proof span {
+    font-size: var(--fs-sm);
+    color: hsl(0 0% 100% / 0.7);
+  }
+  .stars {
+    color: var(--gold-400);
+  }
+  @media (max-width: 960px) {
+    .hero__bg {
+      object-position: 80% 50%;
+    }
+    .hero__shade {
+      background: linear-gradient(0deg, hsl(355 70% 9% / 0.96) 0%, hsl(355 70% 12% / 0.8) 55%, hsl(355 70% 12% / 0.4) 100%);
+    }
+  }
+
+  /* CATEGORÍAS ------------------------------------------------------------ */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1.25rem;
+  }
+  .cat {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    outline: 1px solid var(--line);
+    transition:
+      transform 0.4s var(--ease),
+      box-shadow 0.4s var(--ease),
+      opacity 0.8s var(--ease);
+  }
+  .cat--wide {
+    grid-column: span 3;
+  }
+  .cat:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+  }
+  .cat__img {
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    width: 100%;
+    transition: transform 0.8s var(--ease);
+  }
+  .cat:hover .cat__img {
+    transform: scale(1.05);
+  }
+  .cat__body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 1.4rem 1.5rem 1.5rem;
+    flex: 1;
+    background: var(--white);
+  }
+  .cat__license {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--red-600);
+  }
+  .cat h3 {
+    font-size: var(--fs-xl);
+  }
+  .cat p {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+  }
+  .cat__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 1rem;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .cat__foot strong {
+    font-family: var(--font-display);
+    color: var(--ink);
+    font-size: var(--fs-base);
+  }
+  .cat__arrow {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--red-50);
+    color: var(--red-600);
+    transition:
+      background-color 0.25s,
+      color 0.25s,
+      transform 0.35s var(--ease);
+  }
+  .cat:hover .cat__arrow {
+    background: var(--red-600);
+    color: var(--white);
+    transform: translateX(3px);
+  }
+  @media (max-width: 960px) {
+    .cat-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .cat,
+    .cat--wide {
+      grid-column: span 1;
+    }
+    .cat:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 600px) {
+    .cat-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* PILARES --------------------------------------------------------------- */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  .pillar {
+    padding: 1.75rem;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition:
+      transform 0.35s var(--ease),
+      box-shadow 0.35s var(--ease),
+      opacity 0.8s var(--ease);
+  }
+  .pillar:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+  }
+  .pillar__icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    background: var(--red-600);
+    color: var(--white);
+    box-shadow: var(--shadow-red);
+    margin-bottom: 1.25rem;
+  }
+  .pillar h3 {
+    font-size: var(--fs-lg);
+    margin-bottom: 0.5rem;
+  }
+  .pillar p {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+  }
+  @media (max-width: 960px) {
+    .pillars {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .pillars {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* COMPARATIVA ----------------------------------------------------------- */
+  .cmp {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+  .cmp__copy {
+    display: grid;
+    gap: 1.1rem;
+    justify-items: start;
+  }
+  .cmp__copy h2 {
+    font-size: var(--fs-3xl);
+  }
+  .cmp__copy p {
+    color: hsl(0 0% 100% / 0.8);
+    font-size: var(--fs-lg);
+    margin-bottom: 0.5rem;
+  }
+  .cmp__table {
+    background: var(--white);
+    color: var(--ink);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .cmp__row {
+    display: grid;
+    grid-template-columns: 1fr 86px 96px;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.95rem 1.4rem;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+  }
+  .cmp__row:not(:last-child) {
+    border-bottom: 1px solid var(--line);
+  }
+  .cmp__row > span:not(:first-child) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .cmp__row--head {
+    background: var(--cream);
+    font-family: var(--font-display);
+    font-weight: 800;
+  }
+  .cmp__jv img {
+    border-radius: 50%;
+  }
+  .cmp__yes svg {
+    width: 30px;
+    height: 30px;
+    padding: 6px;
+    border-radius: 50%;
+    background: var(--red-600);
+    color: var(--white);
+    stroke-width: 3;
+  }
+  .cmp__no svg {
+    width: 30px;
+    height: 30px;
+    padding: 7px;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--muted);
+    stroke-width: 2.5;
+  }
+  @media (max-width: 960px) {
+    .cmp {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 480px) {
+    .cmp__row {
+      grid-template-columns: 1fr 56px 76px;
+      padding-inline: 1rem;
+    }
+    .cmp__jv img {
+      display: none;
+    }
+  }
+
+  /* PASOS ----------------------------------------------------------------- */
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+    counter-reset: step;
+    position: relative;
+  }
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 8%;
+    right: 8%;
+    height: 4px;
+    background: repeating-linear-gradient(90deg, var(--red-600) 0 22px, transparent 22px 36px);
+    opacity: 0.35;
+  }
+  .step {
+    position: relative;
+    display: grid;
+    gap: 0.6rem;
+    justify-items: center;
+    text-align: center;
+    padding: 0 0.5rem;
+  }
+  .step__n {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--red-600);
+    color: var(--white);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--fs-lg);
+    box-shadow:
+      0 0 0 6px var(--paper),
+      0 0 0 8px var(--gold-400),
+      var(--shadow-red);
+    margin-bottom: 0.6rem;
+  }
+  .step h3 {
+    font-size: var(--fs-lg);
+  }
+  .step p {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    max-width: 30ch;
+  }
+  @media (max-width: 860px) {
+    .steps {
+      grid-template-columns: 1fr 1fr;
+      row-gap: 2.5rem;
+    }
+    .steps::before {
+      display: none;
+    }
+  }
+  @media (max-width: 480px) {
+    .steps {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* RESEÑAS --------------------------------------------------------------- */
+  .reviews__inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: center;
+  }
+  .reviews__score {
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    padding: 2.5rem 3rem;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    align-content: center;
+    background: var(--red-700);
+    box-shadow:
+      0 0 0 10px hsl(358 82% 40% / 0.25),
+      0 0 0 12px hsl(47 90% 62% / 0.6);
+  }
+  .reviews__num {
+    font-family: var(--font-display);
+    font-stretch: 115%;
+    font-weight: 900;
+    font-size: clamp(3.5rem, 2.5rem + 4vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .reviews__stars {
+    color: var(--gold-400);
+    letter-spacing: 3px;
+    font-size: 1.25rem;
+  }
+  .reviews__count {
+    font-size: var(--fs-sm);
+    color: hsl(0 0% 100% / 0.75);
+  }
+  .reviews__copy {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .reviews__copy h2 {
+    font-size: var(--fs-3xl);
+  }
+  .reviews__copy p {
+    color: hsl(0 0% 100% / 0.75);
+    font-size: var(--fs-lg);
+    max-width: 52ch;
+    margin-bottom: 0.5rem;
+  }
+  @media (max-width: 760px) {
+    .reviews__inner {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      text-align: center;
+    }
+    .reviews__copy {
+      justify-items: center;
+    }
+  }
+
+  /* FAQ + VISITA ---------------------------------------------------------- */
+  .faq-wrap {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+  .visit {
+    position: sticky;
+    top: 100px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .visit__map {
+    display: block;
+    width: 100%;
+    height: 240px;
+    border: 0;
+    filter: saturate(0.85);
+  }
+  .visit__body {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.5rem;
+  }
+  .visit__body h3 {
+    font-size: var(--fs-xl);
+    margin-bottom: 0.25rem;
+  }
+  .visit__line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-sm);
+    color: var(--ink-2);
+  }
+  .visit__line svg {
+    color: var(--red-600);
+  }
+  .visit__hours {
+    justify-content: space-between;
+    padding-block: 0.35rem;
+    border-bottom: 1px dashed var(--line);
+  }
+  .visit__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  .visit__actions .btn--ghost {
+    color: var(--red-600);
+  }
+  @media (max-width: 960px) {
+    .faq-wrap {
+      grid-template-columns: 1fr;
+    }
+    .visit {
+      position: static;
+    }
+  }
+</style>

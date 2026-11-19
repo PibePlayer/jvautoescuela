@@ -1,0 +1,201 @@
+---
+import Icon from './Icon.astro';
+import { promos, waLink } from '../data/site';
+---
+
+<section class="promos" aria-roledescription="carrusel" aria-label="Promociones vigentes" id="promos">
+  <div class="promos__track" id="promos-track">
+    {
+      promos.map((p, i) => (
+        <article class="promo" id={`promo-${p.id}`} aria-roledescription="diapositiva" aria-label={`${i + 1} de ${promos.length}`}>
+          <p class="promo__kicker">{p.kicker}</p>
+          <h3 class="promo__title">{p.title}</h3>
+          <p class="promo__text">{p.text}</p>
+          <a href={waLink(p.message)} target="_blank" rel="noopener" class="promo__cta">
+            {p.cta} <Icon name="arrow" size={16} />
+          </a>
+        </article>
+      ))
+    }
+  </div>
+  <div class="promos__controls">
+    <div class="promos__dots" role="tablist">
+      {
+        promos.map((p, i) => (
+          <button class="promos__dot" role="tab" aria-label={`Ver promo ${i + 1}`} data-index={i} aria-selected={i === 0 ? 'true' : 'false'}>
+            {i + 1}
+          </button>
+        ))
+      }
+    </div>
+    <div class="promos__arrows">
+      <button class="promos__arrow" data-dir="-1" aria-label="Promo anterior"><Icon name="arrow-left" size={18} /></button>
+      <button class="promos__arrow" data-dir="1" aria-label="Promo siguiente"><Icon name="arrow" size={18} /></button>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.getElementById('promos');
+  const track = document.getElementById('promos-track');
+  if (root && track) {
+    const slides = Array.from(track.children) as HTMLElement[];
+    const dots = Array.from(root.querySelectorAll<HTMLButtonElement>('.promos__dot'));
+    let index = 0;
+    let timer: number | undefined;
+
+    const go = (i: number) => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      if (i > index && track.scrollLeft >= maxScroll - 4) i = 0;
+      index = (i + slides.length) % slides.length;
+      track.scrollTo({ left: slides[index].offsetLeft - slides[0].offsetLeft, behavior: 'smooth' });
+    };
+    const sync = () => {
+      const i = Math.min(slides.length - 1, Math.round(track.scrollLeft / slides[0].offsetWidth));
+      index = i;
+      dots.forEach((d, n) => d.setAttribute('aria-selected', String(n === i)));
+    };
+    const play = () => {
+      stop();
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) timer = window.setInterval(() => go(index + 1), 6000);
+    };
+    const stop = () => window.clearInterval(timer);
+
+    track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
+    dots.forEach((d) => d.addEventListener('click', () => (go(Number(d.dataset.index)), play())));
+    root.querySelectorAll<HTMLButtonElement>('.promos__arrow').forEach((b) =>
+      b.addEventListener('click', () => (go(index + Number(b.dataset.dir)), play())),
+    );
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', play);
+    play();
+  }
+</script>
+
+<style>
+  .promos {
+    position: relative;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .promos::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 6px;
+    background: var(--red-600);
+  }
+  .promos__track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .promos__track::-webkit-scrollbar {
+    display: none;
+  }
+  .promo {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    padding: 1.75rem 1.75rem 0.75rem 2.1rem;
+    display: grid;
+    gap: 0.5rem;
+    align-content: start;
+  }
+  @media (min-width: 860px) {
+    .promo {
+      flex-basis: 50%;
+      padding: 2rem 2.25rem 0.75rem 2.5rem;
+    }
+    .promo + .promo {
+      box-shadow: inset 1px 0 0 var(--line);
+    }
+    .promos__controls {
+      padding-left: 2.5rem !important;
+    }
+  }
+  .promo__kicker {
+    font-family: var(--font-display);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red-600);
+  }
+  .promo__title {
+    font-size: var(--fs-xl);
+    color: var(--ink);
+  }
+  .promo__text {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+  }
+  .promo__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    color: var(--red-600);
+    width: fit-content;
+  }
+  .promo__cta svg {
+    transition: transform 0.25s var(--ease);
+  }
+  .promo__cta:hover svg {
+    transform: translateX(4px);
+  }
+  .promos__controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem 1.25rem 2.1rem;
+  }
+  .promos__dots {
+    display: flex;
+    gap: 0.3rem;
+  }
+  .promos__dot {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .promos__dot[aria-selected='true'] {
+    background: var(--red-600);
+    color: var(--white);
+  }
+  .promos__arrows {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .promos__arrow {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1.5px solid var(--line);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .promos__arrow:hover {
+    border-color: var(--red-600);
+    color: var(--red-600);
+  }
+</style>

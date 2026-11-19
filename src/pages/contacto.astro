@@ -1,0 +1,340 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { site, waLink } from '../data/site';
+import { categories } from '../data/cursos';
+
+export const prerender = true;
+---
+
+<Base title="Contacto" description="Contactá a JV Autoescuela en Hurlingham por WhatsApp. Av. Gobernador Vergara 3855. Lunes a viernes de 8 a 18 h y sábados de 9 a 13 h.">
+  <section class="page-hero textured">
+    <div class="container">
+      <p class="eyebrow">Contacto</p>
+      <h1>Hablemos</h1>
+      <p class="page-hero__lead">Contanos qué querés aprender y te respondemos por WhatsApp a la brevedad.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container contact">
+      <form class="form reveal" id="contact-form" novalidate>
+        <h2>Pedí información</h2>
+        <p class="form__hint">Al enviar se abre WhatsApp con tu consulta lista para mandar.</p>
+
+        <div class="field">
+          <label for="f-nombre">Nombre</label>
+          <input id="f-nombre" name="nombre" autocomplete="given-name" required placeholder="¿Cómo te llamás?" />
+        </div>
+
+        <div class="field">
+          <label for="f-curso">¿Qué querés aprender?</label>
+          <select id="f-curso" name="curso" required>
+            <option value="" disabled selected>Elegí un curso</option>
+            {categories.map((c) => <option value={c.navLabel}>{c.navLabel}</option>)}
+            <option value="No estoy seguro/a">No estoy seguro/a</option>
+          </select>
+        </div>
+
+        <fieldset class="field">
+          <legend>¿Tenés experiencia manejando?</legend>
+          <div class="seg">
+            <label><input type="radio" name="nivel" value="Nunca manejé" checked /><span>Nunca manejé</span></label>
+            <label><input type="radio" name="nivel" value="Algo de experiencia" /><span>Algo</span></label>
+            <label><input type="radio" name="nivel" value="Ya tengo licencia" /><span>Tengo licencia</span></label>
+          </div>
+        </fieldset>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-barrio">Barrio</label>
+            <input id="f-barrio" name="barrio" placeholder="Ej: Villa Tesei" />
+          </div>
+          <div class="field">
+            <label for="f-horario">Horario preferido</label>
+            <select id="f-horario" name="horario">
+              <option>Mañana</option>
+              <option>Tarde</option>
+              <option>Sábados</option>
+              <option>Indistinto</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-mensaje">Mensaje (opcional)</label>
+          <textarea id="f-mensaje" name="mensaje" rows="3" placeholder="Contanos cualquier detalle que nos sirva"></textarea>
+        </div>
+
+        <p class="form__error" id="form-error" role="alert" hidden>Completá tu nombre y el curso que te interesa.</p>
+
+        <button type="submit" class="btn btn--wa btn--block" id="contact-submit">
+          <Icon name="whatsapp" /> Enviar por WhatsApp
+        </button>
+      </form>
+
+      <aside class="contact__side reveal">
+        <a href={waLink()} target="_blank" rel="noopener" class="contact-card contact-card--wa" id="contact-wa">
+          <Icon name="whatsapp" size={28} />
+          <span>
+            <small>WhatsApp</small>
+            <strong>{site.whatsapp.display}</strong>
+          </span>
+        </a>
+        <a href={site.address.mapsUrl} target="_blank" rel="noopener" class="contact-card" id="contact-maps">
+          <Icon name="pin" size={28} />
+          <span>
+            <small>Dirección</small>
+            <strong>{site.address.street}</strong>
+            <em>{site.address.locality}, {site.address.region}</em>
+          </span>
+        </a>
+        <div class="contact-card">
+          <Icon name="clock" size={28} />
+          <span>
+            <small>Horarios</small>
+            {site.hours.map((h) => <em><b>{h.days}:</b> {h.time}</em>)}
+          </span>
+        </div>
+        <iframe
+          src={site.address.embedUrl}
+          title="Mapa de JV Autoescuela"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          class="contact__map"></iframe>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script define:vars={{ number: site.whatsapp.number }}>
+  const form = document.getElementById('contact-form');
+  const err = document.getElementById('form-error');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const d = new FormData(form);
+    const nombre = String(d.get('nombre') || '').trim();
+    const curso = String(d.get('curso') || '');
+    if (!nombre || !curso) {
+      err.hidden = false;
+      (nombre ? form.querySelector('#f-curso') : form.querySelector('#f-nombre')).focus();
+      return;
+    }
+    err.hidden = true;
+    const lines = [
+      `¡Hola JV Autoescuela! Soy ${nombre}.`,
+      `Me interesa: ${curso}.`,
+      `Experiencia: ${d.get('nivel')}.`,
+      d.get('barrio') ? `Barrio: ${d.get('barrio')}.` : '',
+      `Horario preferido: ${d.get('horario')}.`,
+      String(d.get('mensaje') || '').trim(),
+    ].filter(Boolean);
+    window.open(`https://wa.me/${number}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
+  });
+</script>
+
+<style>
+  .page-hero {
+    position: relative;
+    background: var(--red-700);
+    color: var(--white);
+    isolation: isolate;
+    padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+  }
+  .page-hero h1 {
+    font-size: var(--fs-4xl);
+    margin-top: 0.75rem;
+  }
+  .page-hero__lead {
+    max-width: 56ch;
+    margin-top: 1rem;
+    font-size: var(--fs-lg);
+    color: hsl(0 0% 100% / 0.82);
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+  }
+  .form {
+    display: grid;
+    gap: 1.1rem;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .form h2 {
+    font-size: var(--fs-2xl);
+  }
+  .form__hint {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+    margin-top: -0.6rem;
+  }
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  label,
+  legend {
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    padding: 0;
+  }
+  legend {
+    margin-bottom: 0.4rem;
+  }
+  input:not([type='radio']),
+  select,
+  textarea {
+    width: 100%;
+    min-height: 50px;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--paper);
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s,
+      background-color 0.2s;
+  }
+  textarea {
+    resize: vertical;
+  }
+  input:not([type='radio']):focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--red-500);
+    background: var(--white);
+    box-shadow: 0 0 0 4px hsl(358 78% 47% / 0.12);
+  }
+  .seg {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+    padding: 0.3rem;
+    background: var(--cream);
+    border-radius: 14px;
+  }
+  .seg label {
+    position: relative;
+    cursor: pointer;
+  }
+  .seg input {
+    position: absolute;
+    opacity: 0;
+  }
+  .seg span {
+    display: grid;
+    place-items: center;
+    min-height: 44px;
+    padding: 0.4rem;
+    border-radius: 10px;
+    text-align: center;
+    font-size: var(--fs-sm);
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      box-shadow 0.2s;
+  }
+  .seg input:checked + span {
+    background: var(--red-600);
+    color: var(--white);
+    box-shadow: var(--shadow-red);
+  }
+  .seg input:focus-visible + span {
+    outline: 3px solid var(--gold-400);
+  }
+  .form__error {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: var(--red-50);
+    color: var(--red-700);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+
+  .contact__side {
+    display: grid;
+    gap: 1rem;
+  }
+  .contact-card {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.25rem 1.4rem;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    outline: 1px solid var(--line);
+    transition:
+      transform 0.3s var(--ease),
+      box-shadow 0.3s var(--ease);
+  }
+  a.contact-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .contact-card > svg {
+    flex: none;
+    color: var(--red-600);
+  }
+  .contact-card span {
+    display: grid;
+    gap: 0.15rem;
+  }
+  .contact-card small {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .contact-card strong {
+    font-family: var(--font-display);
+    font-size: var(--fs-lg);
+  }
+  .contact-card em {
+    font-style: normal;
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+  .contact-card--wa {
+    background: var(--wa);
+    color: var(--white);
+    outline: 0;
+  }
+  .contact-card--wa > svg,
+  .contact-card--wa small {
+    color: hsl(0 0% 100% / 0.85);
+  }
+  .contact__map {
+    width: 100%;
+    height: 260px;
+    border: 0;
+    border-radius: var(--radius);
+  }
+  @media (max-width: 860px) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 480px) {
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

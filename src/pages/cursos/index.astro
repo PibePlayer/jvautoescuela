@@ -1,0 +1,178 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import PackCard from '../../components/PackCard.astro';
+import { categories, groupLabels, type Category } from '../../data/cursos';
+
+export const prerender = true;
+
+const groups = (Object.keys(groupLabels) as Category['group'][]).map((g) => ({
+  key: g,
+  label: groupLabels[g],
+  cats: categories.filter((c) => c.group === g),
+}));
+---
+
+<Base
+  title="Cursos de manejo y precios"
+  description="Cursos de manejo en Hurlingham: auto manual y automático, motos de 50 cc a alta cilindrada, camiones y colectivos. Packs por nivel con cuotas sin interés."
+>
+  <section class="page-hero textured">
+    <div class="container">
+      <p class="eyebrow">Cursos y precios</p>
+      <h1>Elegí tu curso</h1>
+      <p class="page-hero__lead">
+        Packs pensados por nivel —inicial, intermedio y avanzado— para que pagues sólo las clases que realmente
+        necesitás. Todos incluyen instructor dedicado y vehículo con seguro.
+      </p>
+      <nav class="chips" aria-label="Ir a categoría">
+        {categories.map((c) => <a href={`#${c.slug}`} class="chip">{c.navLabel}</a>)}
+      </nav>
+    </div>
+  </section>
+
+  {
+    groups.map((g, gi) => (
+      <section class:list={['section', { 'section--cream': gi % 2 === 1 }]} aria-label={g.label}>
+        <div class="container">
+          {g.cats.map((c) => (
+            <div class="cat-block" id={c.slug}>
+              <div class="cat-block__head reveal">
+                <img src={c.image} alt={c.imageAlt} width="1000" height="747" loading="lazy" />
+                <div>
+                  <p class="eyebrow">{c.license}</p>
+                  <h2>{c.name}</h2>
+                  <p>{c.intro}</p>
+                  <a href={`/cursos/${c.slug}`} class="cat-block__more">
+                    Ver programa completo y requisitos <Icon name="arrow" size={16} />
+                  </a>
+                </div>
+              </div>
+              <div class="packs">
+                {c.packs.map((p) => (
+                  <PackCard pack={p} category={c} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section">
+    <div class="container note reveal">
+      <Icon name="card" size={28} />
+      <p>
+        <strong>Precios finales en pesos.</strong> Aceptamos efectivo, transferencia, Mercado Pago y tarjetas de crédito
+        en hasta 6 cuotas sin interés. Muy pronto vas a poder comprar y reservar tus clases online.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-hero {
+    position: relative;
+    background: var(--red-700);
+    color: var(--white);
+    isolation: isolate;
+    padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+  }
+  .page-hero h1 {
+    font-size: var(--fs-4xl);
+    margin-top: 0.75rem;
+  }
+  .page-hero__lead {
+    max-width: 60ch;
+    margin-top: 1rem;
+    font-size: var(--fs-lg);
+    color: hsl(0 0% 100% / 0.82);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 2rem;
+  }
+  .chip {
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    background: hsl(0 0% 100% / 0.1);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .chip:hover {
+    background: var(--gold-400);
+    color: var(--red-950);
+  }
+
+  .cat-block + .cat-block {
+    margin-top: var(--section);
+  }
+  .cat-block__head {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+  .cat-block__head img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+  }
+  .cat-block__head h2 {
+    font-size: var(--fs-3xl);
+    margin-block: 0.6rem 0.9rem;
+  }
+  .cat-block__head p:not(.eyebrow) {
+    color: var(--muted);
+    font-size: var(--fs-lg);
+    max-width: 60ch;
+  }
+  .cat-block__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    font-weight: 700;
+    color: var(--red-600);
+  }
+  .cat-block__more svg {
+    transition: transform 0.25s var(--ease);
+  }
+  .cat-block__more:hover svg {
+    transform: translateX(4px);
+  }
+  .packs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.25rem;
+    align-items: stretch;
+  }
+  @media (max-width: 860px) {
+    .cat-block__head {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .note {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.5rem 1.75rem;
+    background: var(--red-50);
+    border-radius: var(--radius-lg);
+    color: var(--ink-2);
+  }
+  .note svg {
+    flex: none;
+    color: var(--red-600);
+  }
+</style>

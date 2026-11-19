@@ -1,0 +1,152 @@
+---
+import Icon from './Icon.astro';
+import { ars, waLink } from '../data/site';
+import type { Category, Pack } from '../data/cursos';
+
+type Props = { pack: Pack; category: Category };
+const { pack, category } = Astro.props;
+
+const hours = (pack.classes * pack.minutesPerClass) / 60;
+const priceText = pack.price !== null ? ars(pack.price) : 'Consultar';
+const message =
+  pack.price !== null
+    ? `Hola! Quiero contratar el curso de ${category.navLabel}: ${pack.name} (${priceText}). ¿Qué horarios tienen disponibles?`
+    : `Hola! Quiero información y precio del curso de ${category.navLabel}: ${pack.name}.`;
+---
+
+<article
+  class:list={['pack', { 'pack--featured': pack.featured }]}
+  id={`pack-${pack.id}`}
+  data-pack-id={pack.id}
+  data-price={pack.price ?? ''}
+>
+  {pack.featured && <span class="pack__badge">Más elegido</span>}
+  <header class="pack__head">
+    {pack.level && <span class="pack__level">{pack.level}</span>}
+    <h3 class="pack__name">{pack.name}</h3>
+    <p class="pack__meta">
+      {pack.classes} {pack.classes === 1 ? 'clase' : 'clases'} de {pack.minutesPerClass} min
+      {pack.classes > 1 && <> · {hours} h de práctica</>}
+    </p>
+  </header>
+
+  <div class="pack__price">
+    {pack.listPrice && pack.price && <s>{ars(pack.listPrice)}</s>}
+    <span class="price">{priceText}</span>
+    {pack.price !== null && <small>Hasta 6 cuotas sin interés</small>}
+  </div>
+
+  <p class="pack__desc">{pack.description}</p>
+
+  <ul class="check-list pack__includes">
+    {pack.includes.map((i) => <li>{i}</li>)}
+  </ul>
+
+  <a
+    href={waLink(message)}
+    target="_blank"
+    rel="noopener"
+    class:list={['btn btn--block', pack.featured ? 'btn--primary' : 'btn--ghost pack__btn']}
+    id={`buy-${pack.id}`}
+  >
+    {pack.price !== null ? 'Quiero este curso' : 'Pedir precio'}
+    <Icon name="arrow" />
+  </a>
+</article>
+
+<style>
+  .pack {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding: 1.75rem;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    outline: 1px solid var(--line);
+    transition:
+      transform 0.35s var(--ease),
+      box-shadow 0.35s var(--ease);
+  }
+  .pack:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+  }
+  .pack--featured {
+    outline: 0;
+    background:
+      linear-gradient(var(--white), var(--white)) padding-box,
+      var(--red-600);
+    box-shadow:
+      0 0 0 2px var(--red-600),
+      var(--shadow);
+  }
+  .pack__badge {
+    position: absolute;
+    top: -13px;
+    right: 1.5rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    background: var(--gold-400);
+    color: var(--red-950);
+    font-family: var(--font-display);
+    font-size: var(--fs-xs);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pack__head {
+    display: grid;
+    gap: 0.3rem;
+  }
+  .pack__level {
+    font-family: var(--font-display);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red-600);
+  }
+  .pack__name {
+    font-size: var(--fs-xl);
+  }
+  .pack__meta {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+  }
+  .pack__price {
+    display: grid;
+    gap: 0.1rem;
+    padding-block: 1rem;
+    border-block: 1px dashed var(--line);
+  }
+  .pack__price s {
+    color: var(--muted);
+    font-size: var(--fs-sm);
+  }
+  .pack__price .price {
+    font-size: var(--fs-2xl);
+    color: var(--ink);
+  }
+  .pack__price small {
+    color: var(--muted);
+    font-size: var(--fs-xs);
+  }
+  .pack__desc {
+    color: var(--ink-2);
+    font-size: var(--fs-sm);
+  }
+  .pack__includes {
+    font-size: var(--fs-sm);
+    flex: 1;
+  }
+  .pack__btn {
+    color: var(--red-600);
+  }
+  .pack__btn:hover {
+    background: var(--red-600);
+    color: var(--white);
+    box-shadow: none;
+  }
+</style>

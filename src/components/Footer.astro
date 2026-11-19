@@ -1,0 +1,234 @@
+---
+import Icon from './Icon.astro';
+import { site, waLink } from '../data/site';
+import { categories } from '../data/cursos';
+const year = new Date().getFullYear();
+---
+
+<section class="cta-band textured" aria-labelledby="cta-band-title">
+  <div class="container cta-band__inner">
+    <div>
+      <p class="eyebrow">Arrancá esta semana</p>
+      <h2 id="cta-band-title">¿Querés aprender a manejar <em>de verdad</em>?</h2>
+    </div>
+    <div class="cta-band__actions">
+      <a href={waLink()} target="_blank" rel="noopener" class="btn btn--gold" id="cta-band-wa">
+        <Icon name="whatsapp" /> Escribinos por WhatsApp
+      </a>
+      <a href="/cursos" class="btn btn--ghost" id="cta-band-cursos">Ver cursos y precios</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="road-divider" aria-hidden="true"></div>
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <a href="/" class="footer__logo">
+        <img src="/img/logo.webp" alt="JV Autoescuela" width="72" height="72" loading="lazy" />
+      </a>
+      <p>
+        Autoescuela habilitada en Hurlingham. Formamos conductores seguros en auto, moto, camión y colectivo, con
+        instructores profesionales y vehículos doble comando.
+      </p>
+      <div class="footer__social">
+        {
+          site.social.youtube && (
+            <a href={site.social.youtube} target="_blank" rel="noopener" aria-label="YouTube">
+              <Icon name="youtube" size={20} />
+            </a>
+          )
+        }
+        {
+          site.social.instagram && (
+            <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Instagram">
+              <Icon name="instagram" size={20} />
+            </a>
+          )
+        }
+        {
+          site.social.facebook && (
+            <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Facebook">
+              <Icon name="facebook" size={20} />
+            </a>
+          )
+        }
+        <a href={waLink()} target="_blank" rel="noopener" aria-label="WhatsApp">
+          <Icon name="whatsapp" size={20} />
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <h3>Cursos</h3>
+      <ul>
+        {categories.map((c) => <li><a href={`/cursos/${c.slug}`}>{c.navLabel}</a></li>)}
+      </ul>
+    </div>
+
+    <div>
+      <h3>Visitanos</h3>
+      <ul class="footer__contact">
+        <li>
+          <Icon name="pin" size={18} />
+          <a href={site.address.mapsUrl} target="_blank" rel="noopener">
+            {site.address.street}<br />{site.address.locality}, {site.address.region}
+          </a>
+        </li>
+        <li>
+          <Icon name="whatsapp" size={18} />
+          <a href={waLink()} target="_blank" rel="noopener">{site.whatsapp.display}</a>
+        </li>
+        <li>
+          <Icon name="clock" size={18} />
+          <span>
+            {site.hours.map((h) => <>{h.days}: {h.time}<br /></>)}
+          </span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p>© {year} {site.name}. Todos los derechos reservados.</p>
+    <p>Precios y promociones sujetos a cambios sin previo aviso.</p>
+  </div>
+</footer>
+
+<style>
+  .cta-band {
+    position: relative;
+    background: var(--red-600);
+    color: var(--white);
+    isolation: isolate;
+    padding-block: clamp(3rem, 2rem + 4vw, 5rem);
+    overflow: hidden;
+  }
+  .cta-band::after {
+    content: '';
+    position: absolute;
+    right: -120px;
+    top: 50%;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    border: 3px solid hsl(47 90% 62% / 0.5);
+    transform: translateY(-50%);
+    z-index: -1;
+  }
+  .cta-band__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .cta-band h2 {
+    font-size: var(--fs-3xl);
+    margin-top: 0.6rem;
+    max-width: 18ch;
+  }
+  .cta-band em {
+    font-style: normal;
+    color: var(--gold-400);
+  }
+  .cta-band .eyebrow {
+    color: var(--gold-400);
+  }
+  .cta-band__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .footer {
+    background: var(--red-950);
+    color: hsl(0 0% 100% / 0.72);
+    font-size: var(--fs-sm);
+  }
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1.2fr;
+    gap: 3rem;
+    padding-block: 4rem 3rem;
+  }
+  .footer__brand p {
+    max-width: 38ch;
+    margin-top: 1.25rem;
+  }
+  .footer__logo img {
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px hsl(47 90% 62% / 0.7);
+  }
+  .footer h3 {
+    color: var(--white);
+    font-size: var(--fs-base);
+    margin-bottom: 1.1rem;
+    letter-spacing: 0;
+  }
+  .footer ul {
+    display: grid;
+    gap: 0.6rem;
+  }
+  .footer a {
+    transition: color 0.2s;
+  }
+  .footer a:hover {
+    color: var(--gold-400);
+  }
+  .footer__contact li {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 0.7rem;
+    align-items: start;
+  }
+  .footer__contact svg {
+    margin-top: 2px;
+    color: var(--gold-400);
+  }
+  .footer__social {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+  .footer__social a {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: hsl(0 0% 100% / 0.07);
+    color: var(--white);
+    transition:
+      background-color 0.2s,
+      transform 0.25s var(--ease);
+  }
+  .footer__social a:hover {
+    background: var(--red-600);
+    color: var(--white);
+    transform: translateY(-2px);
+  }
+  .footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-block: 1.5rem;
+    border-top: 1px solid hsl(0 0% 100% / 0.08);
+    font-size: var(--fs-xs);
+    color: hsl(0 0% 100% / 0.5);
+  }
+  @media (max-width: 860px) {
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .footer__brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (max-width: 520px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

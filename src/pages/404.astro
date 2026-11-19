@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/Base.astro';
+export const prerender = true;
+---
+
+<Base title="Página no encontrada">
+  <section class="nf textured">
+    <div class="container nf__inner">
+      <p class="nf__code">404</p>
+      <h1>Te fuiste de ruta</h1>
+      <p>La página que buscás no existe o cambió de lugar. Volvamos al camino.</p>
+      <div class="nf__actions">
+        <a href="/" class="btn btn--gold">Ir al inicio</a>
+        <a href="/cursos" class="btn btn--ghost">Ver cursos</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    position: relative;
+    background: var(--red-700);
+    color: var(--white);
+    isolation: isolate;
+    padding-block: clamp(5rem, 4rem + 8vw, 9rem);
+    text-align: center;
+  }
+  .nf__inner {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+  .nf__code {
+    font-family: var(--font-display);
+    font-stretch: 120%;
+    font-weight: 900;
+    font-size: clamp(5rem, 3rem + 10vw, 9rem);
+    line-height: 1;
+    color: var(--gold-400);
+    letter-spacing: -0.02em;
+  }
+  .nf h1 {
+    font-size: var(--fs-3xl);
+  }
+  .nf p:not(.nf__code) {
+    color: hsl(0 0% 100% / 0.8);
+  }
+  .nf__actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+</style>
