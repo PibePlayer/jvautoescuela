@@ -6,16 +6,65 @@ const { items, id = 'faq' } = Astro.props;
 <div class="faq" id={id}>
   {
     items.map((item, i) => (
-      <details class="faq__item" name={id} open={i === 0}>
+      <details class="faq__item" open={i === 0}>
         <summary>
           <span>{item.q}</span>
           <span class="faq__icon" aria-hidden="true" />
         </summary>
-        <p>{item.a}</p>
+        <div class="faq__body">
+          <div class="faq__inner">
+            <p>{item.a}</p>
+          </div>
+        </div>
       </details>
     ))
   }
 </div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.faq').forEach((faq) => {
+    const items = Array.from(faq.querySelectorAll<HTMLDetailsElement>('.faq__item'));
+    const closeItem = (el: HTMLDetailsElement) => {
+      const body = el.querySelector<HTMLElement>('.faq__body');
+      if (!body || !el.open) return;
+      el.classList.add('is-closing');
+      const anim = body.animate([{ height: `${body.offsetHeight}px` }, { height: '0px' }], {
+        duration: 260,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      });
+      anim.onfinish = () => {
+        el.open = false;
+        el.classList.remove('is-closing');
+      };
+    };
+    const openItem = (el: HTMLDetailsElement) => {
+      const body = el.querySelector<HTMLElement>('.faq__body');
+      el.open = true;
+      if (!body) return;
+      const target = body.scrollHeight;
+      body.animate([{ height: '0px' }, { height: `${target}px` }], {
+        duration: 300,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+      });
+    };
+
+    items.forEach((el) => {
+      const summary = el.querySelector('summary');
+      summary?.addEventListener('click', (e) => {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        e.preventDefault();
+        if (el.open && !el.classList.contains('is-closing')) {
+          closeItem(el);
+        } else {
+          items.forEach((other) => {
+            if (other !== el && other.open) closeItem(other);
+          });
+          openItem(el);
+        }
+      });
+    });
+  });
+</script>
 
 <style>
   .faq {
@@ -73,15 +122,18 @@ const { items, id = 'faq' } = Astro.props;
   .faq__icon::after {
     transform: translate(-50%, -50%) rotate(90deg);
   }
-  .faq__item[open] .faq__icon {
+  .faq__item[open]:not(.is-closing) .faq__icon {
     background: var(--red-600);
     transform: rotate(45deg);
   }
-  .faq__item[open] .faq__icon::before,
-  .faq__item[open] .faq__icon::after {
+  .faq__item[open]:not(.is-closing) .faq__icon::before,
+  .faq__item[open]:not(.is-closing) .faq__icon::after {
     background: var(--white);
   }
-  .faq__item p {
+  .faq__body {
+    overflow: hidden;
+  }
+  .faq__inner p {
     padding: 0 1.4rem 1.3rem;
     color: var(--ink-2);
     max-width: 70ch;

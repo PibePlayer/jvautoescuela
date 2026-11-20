@@ -25,8 +25,14 @@ const message =
     {pack.level && <span class="pack__level">{pack.level}</span>}
     <h3 class="pack__name">{pack.name}</h3>
     <p class="pack__meta">
-      {pack.classes} {pack.classes === 1 ? 'clase' : 'clases'} de {pack.minutesPerClass} min
-      {pack.classes > 1 && <> · {hours} h de práctica</>}
+      {
+        pack.meta ?? (
+          <>
+            {pack.classes} {pack.classes === 1 ? 'clase' : 'clases'} de {pack.minutesPerClass} min
+            {pack.classes > 1 && <> · {hours} h de práctica</>}
+          </>
+        )
+      }
     </p>
   </header>
 

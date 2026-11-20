@@ -44,14 +44,25 @@ import { promos, waLink } from '../data/site';
     let index = 0;
     let timer: number | undefined;
 
+    const maxIndex = () => {
+      const perView = Math.max(1, Math.round(track.clientWidth / slides[0].offsetWidth));
+      return Math.max(0, slides.length - perView);
+    };
+    const updateDots = () => {
+      const max = maxIndex();
+      dots.forEach((d, n) => {
+        d.hidden = n > max;
+      });
+      if (index > max) index = max;
+    };
     const go = (i: number) => {
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (i > index && track.scrollLeft >= maxScroll - 4) i = 0;
-      index = (i + slides.length) % slides.length;
+      const count = maxIndex() + 1;
+      index = ((i % count) + count) % count;
       track.scrollTo({ left: slides[index].offsetLeft - slides[0].offsetLeft, behavior: 'smooth' });
     };
     const sync = () => {
-      const i = Math.min(slides.length - 1, Math.round(track.scrollLeft / slides[0].offsetWidth));
+      const max = maxIndex();
+      const i = Math.min(max, Math.round(track.scrollLeft / slides[0].offsetWidth));
       index = i;
       dots.forEach((d, n) => d.setAttribute('aria-selected', String(n === i)));
     };
@@ -61,6 +72,11 @@ import { promos, waLink } from '../data/site';
     };
     const stop = () => window.clearInterval(timer);
 
+    updateDots();
+    window.addEventListener('resize', () => {
+      updateDots();
+      sync();
+    });
     track.addEventListener('scroll', () => requestAnimationFrame(sync), { passive: true });
     dots.forEach((d) => d.addEventListener('click', () => (go(Number(d.dataset.index)), play())));
     root.querySelectorAll<HTMLButtonElement>('.promos__arrow').forEach((b) =>

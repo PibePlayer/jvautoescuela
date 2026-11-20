@@ -10,7 +10,7 @@ export const faqs = [
   },
   {
     q: '¿Cuántas clases necesito?',
-    a: 'Depende de tu experiencia previa. Si nunca manejaste, recomendamos el pack de 12 clases; si ya tenés nociones, 8 suele alcanzar; y si solo querés pulir algo puntual, 4 o clases sueltas. En la primera clase evaluamos tu nivel y te decimos con honestidad.',
+    a: 'Depende de tu experiencia previa. Si nunca manejaste, recomendamos el curso completo de 10 clases; si ya tenés nociones, el pack de 5 clases suele alcanzar; y si solo querés pulir algo puntual, ofrecemos clases individuales personalizadas. En la primera clase evaluamos tu nivel y te decimos con honestidad.',
   },
   {
     q: '¿Me pasan a buscar por mi casa?',
