@@ -6,7 +6,6 @@ import type { Category, Pack } from '../data/cursos';
 type Props = { pack: Pack; category: Category };
 const { pack, category } = Astro.props;
 
-const hours = (pack.classes * pack.minutesPerClass) / 60;
 const priceText = pack.price !== null ? ars(pack.price) : 'Consultar';
 const message =
   pack.price !== null
@@ -29,7 +28,6 @@ const message =
         pack.meta ?? (
           <>
             {pack.classes} {pack.classes === 1 ? 'clase' : 'clases'} de {pack.minutesPerClass} min
-            {pack.classes > 1 && <> · {hours} h de práctica</>}
           </>
         )
       }
